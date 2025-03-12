@@ -11,7 +11,7 @@ installed on your system by downloading it from
 at the Julia REPL:
 
 ```
-import Pkg; Pkg.add(url="https://github.com/pvermees/KJ.jl.git")
+import Pkg; Pkg.add(url="https://github.com/Yoli-Wu/KJ.jl.git")
 ```
 
 There are four ways to interact with KJ:
