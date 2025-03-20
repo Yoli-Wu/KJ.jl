@@ -39,11 +39,7 @@ function averat(run::Vector{Sample},
         samp = run[i]
         out[i,:name] = samp.sname
         x, sx, y, sy, rho = averat(samp, channels, blank, pars)
-        # Debug
-        println("Sample: ", samp.sname)
-        println("x (should be 87Rb/87Sr) = ", x, " ± ", sx)
-        println("y (should be 86Sr/87Sr) = ", y, " ± ", sy)
-        println("rho = ", rho)
+        
         if method == "Rb-Sr"
            Sr87_Sr86 = 1 / y
            s_Sr87_Sr86 = sy * (Sr87_Sr86^2)
