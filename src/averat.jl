@@ -39,22 +39,25 @@ function averat(run::Vector{Sample},
         samp = run[i]
         out[i,:name] = samp.sname
         x, sx, y, sy, rho = averat(samp, channels, blank, pars)
-
+        # Debug
+        println("Sample: ", samp.sname)
+        println("x (should be 87Rb/87Sr) = ", x, " ± ", sx)
+        println("y (should be 86Sr/87Sr) = ", y, " ± ", sy)
+        println("rho = ", rho)
         if method == "Rb-Sr"
-           Rb87_Sr86 = x * (1 / y)
-           s_Rb87_Sr86 = Rb87_Sr86 * sqrt((sx / x)^2 + (sy / y)^2 + 2 * rho * (sx / x) * (sy / y))
            Sr87_Sr86 = 1 / y
            s_Sr87_Sr86 = sy * (Sr87_Sr86^2)
-
+           Rb87_Sr86 = x * Sr87_Sr86
+           s_Rb87_Sr86 = Rb87_Sr86 * sqrt((sx / x)^2 + (s_Sr87_Sr86 / Sr87_Sr86)^2 + 2*rho*(sx / x)*(s_Sr87_Sr86 / Sr87_Sr86))
            out[i, 2:6] = [x, sx, y, sy, rho]
            out[i, 7:10] = [Rb87_Sr86, s_Rb87_Sr86, Sr87_Sr86, s_Sr87_Sr86]
-        else
+       else
            out[i, 2:end] = [x, sx, y, sy, rho]
-        end
-
+       end
     end
     return out
 end
+
 function averat(samp::Sample,
                 channels::AbstractDict,
                 blank::AbstractDataFrame,
