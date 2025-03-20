@@ -25,12 +25,33 @@ function averat(run::Vector{Sample},
         xlab = P * "/" * D
         ylab = d * "/" * D
     end
-    column_names = ["name", xlab, "s[" * xlab * "]", ylab, "s[" * ylab * "]", "rho"]
-    out = DataFrame(hcat(fill("",ns),zeros(ns,5)),column_names)
+    
+    if method == "Rb-Sr"
+        column_names = ["name", xlab, "s[" * xlab * "]", ylab, "s[" * ylab * "]", "rho",
+                    "Rb87/Sr86", "s[Rb87/Sr86]", "Sr87/Sr86", "s[Sr87/Sr86]"]
+        out = DataFrame(hcat(fill("", ns), zeros(ns, 9)), column_names)
+    else
+        column_names = ["name", xlab, "s[" * xlab * "]", ylab, "s[" * ylab * "]", "rho"]
+        out = DataFrame(hcat(fill("", ns), zeros(ns, 5)), column_names)
+    end
+  
     for i in 1:ns
         samp = run[i]
         out[i,:name] = samp.sname
-        out[i,2:end] = averat(samp,channels,blank,pars)
+        x, sx, y, sy, rho = averat(samp, channels, blank, pars)
+
+        if method == "Rb-Sr"
+           Rb87_Sr86 = x * (1 / y)
+           s_Rb87_Sr86 = Rb87_Sr86 * sqrt((sx / x)^2 + (sy / y)^2 + 2 * rho * (sx / x) * (sy / y))
+           Sr87_Sr86 = 1 / y
+           s_Sr87_Sr86 = sy * (Sr87_Sr86^2)
+
+           out[i, 2:6] = [x, sx, y, sy, rho]
+           out[i, 7:10] = [Rb87_Sr86, s_Rb87_Sr86, Sr87_Sr86, s_Sr87_Sr86]
+        else
+           out[i, 2:end] = [x, sx, y, sy, rho]
+        end
+
     end
     return out
 end
