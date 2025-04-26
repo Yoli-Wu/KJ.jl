@@ -50,6 +50,8 @@ function fractionation(run::Vector{Sample},
 
 end
 # isotopic mass fractionation using glass
+# Note: P signal is now included for glass-only mass fractionation correction,
+# enabling compatibility with full isotopic ratio workflows (e.g., Rb-Sr, U-Pb).
 function fractionation(run::Vector{Sample},
                        method::AbstractString,
                        blank::AbstractDataFrame,
@@ -64,10 +66,11 @@ function fractionation(run::Vector{Sample},
         dats[refmat] = pool(run;signal=true,group=refmat)
     end
 
+    bP = blank[:,channels["P"]]
     bD = blank[:,channels["D"]]
     bd = blank[:,channels["d"]]
 
-    return SSfit([0.0],bD,bd,dats,channels,anchors;verbose=verbose)
+    return SSfit([0.0],bP,bD,bd,dats,channels,anchors;verbose=verbose)
     
 end
 # for concentration measurements:
@@ -148,6 +151,7 @@ function SSfit(init::AbstractVector,
 end
 # glass
 function SSfit(init::AbstractVector,
+               bP::AbstractVector,
                bD::AbstractVector,
                bd::AbstractVector,
                dats::AbstractDict,
@@ -155,7 +159,7 @@ function SSfit(init::AbstractVector,
                anchors::AbstractDict;
                verbose::Bool=false)
 
-    objective = (par) -> SS(par,bD,bd,dats,channels,anchors)
+    objective = (par) -> SS(par,bP,bD,bd,dats,channels,anchors)
     
     fit = Optim.optimize(objective,init)
     pars = Optim.minimizer(fit)
