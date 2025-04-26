@@ -44,7 +44,7 @@ function averat(run::Vector{Sample},
            Sr87_Sr86 = 1 / y
            s_Sr87_Sr86 = sy * (Sr87_Sr86^2)
            Rb87_Sr86 = x * Sr87_Sr86
-           s_Rb87_Sr86 = Rb87_Sr86 * sqrt((sx / x)^2 + (s_Sr87_Sr86 / Sr87_Sr86)^2 - 2*rho*(sx / x)*(s_Sr87_Sr86 / Sr87_Sr86))
+           s_Rb87_Sr86 = Rb87_Sr86 * sqrt((sx / x)^2 + (s_Sr87_Sr86 / Sr87_Sr86)^2 + 2*rho*(sx / x)*(s_Sr87_Sr86 / Sr87_Sr86))
            out[i, 2:6] = [x, sx, y, sy, rho]
            out[i, 7:10] = [Rb87_Sr86, s_Rb87_Sr86, Sr87_Sr86, s_Sr87_Sr86]
        else
